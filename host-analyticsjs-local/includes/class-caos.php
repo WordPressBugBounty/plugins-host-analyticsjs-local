@@ -29,7 +29,7 @@ class CAOS {
 		$this->do_setup();
 
 		if ( version_compare( CAOS_STORED_DB_VERSION, CAOS_DB_VERSION ) < 0 ) {
-			new CAOS_DB();
+			add_action( 'plugins_loaded', [ $this, 'migrate_db' ] );
 		}
 
 		if ( is_admin() ) {
@@ -55,6 +55,9 @@ class CAOS {
 		add_action( 'deactivated_plugin', [ $this, 'maybe_do_update' ] );
 		add_action( 'admin_init', [ $this, 'do_update_after_save' ] );
 		add_action( 'in_plugin_update_message-' . CAOS_PLUGIN_BASENAME, [ $this, 'render_update_notice' ], 11, 2 );
+
+		// Force Option Values
+		add_action( 'init', [ $this, 'maybe_force_option_values' ] );
 	}
 
 	/**
@@ -124,6 +127,7 @@ class CAOS {
 
 	/**
 	 * Includes backwards compatibility for pre 3.11.0
+	 *
 	 * @since 3.11.0
 	 * @return string|void
 	 */
@@ -155,6 +159,7 @@ class CAOS {
 
 	/**
 	 * Method to retrieve settings from database.
+	 *
 	 * @filter caos_setting_{$name}
 	 * @since  v4.5.1
 	 *
@@ -186,6 +191,7 @@ class CAOS {
 
 	/**
 	 * Gets all settings for CAOS.
+	 *
 	 * @since 4.5.1
 	 * @return array
 	 */
@@ -201,6 +207,7 @@ class CAOS {
 
 	/**
 	 * Get alias of JS library.
+	 *
 	 * @return string
 	 */
 	public static function get_file_alias() {
@@ -231,6 +238,7 @@ class CAOS {
 
 	/**
 	 * Returns early if File Aliases option doesn't exist for Backwards Compatibility.
+	 *
 	 * @since 3.11.0
 	 * @return string
 	 */
@@ -308,10 +316,12 @@ class CAOS {
 	}
 
 	/**
+	 * Run database migrations.
 	 *
+	 * @return CAOS_DB
 	 */
-	public static function uses_minimal_analytics() {
-		return self::get( CAOS_Admin_Settings::CAOS_BASIC_SETTING_TRACKING_CODE ) === 'minimal_ga4';
+	public function migrate_db() {
+		return new CAOS_DB();
 	}
 
 	/**
@@ -327,6 +337,7 @@ class CAOS {
 
 	/**
 	 * Triggers when CAOS (Pro) is (de)activated.
+	 *
 	 * @return CAOS_Cron
 	 */
 	public function trigger_cron_script() {
@@ -350,13 +361,21 @@ class CAOS {
 
 		/**
 		 * No need to update any files if we're using Minimal Analytics. Can't believe I'm only finding out about this now...
+		 *
 		 * @since 4.7.0
 		 */
-		if ( self::get( 'tracking_code' ) === 'minimal_ga4' ) {
+		if ( self::uses_minimal_analytics() ) {
 			return;
 		}
 
 		return $this->trigger_cron_script();
+	}
+
+	/**
+	 *
+	 */
+	public static function uses_minimal_analytics() {
+		return self::get( CAOS_Admin_Settings::CAOS_BASIC_SETTING_TRACKING_CODE ) === 'minimal_ga4';
 	}
 
 	/**
@@ -398,6 +417,7 @@ class CAOS {
 	 * We use a custom update action, because we're storing multidimensional arrays upon form submit.
 	 * This prevents us from having to use AJAX, serialize(), stringify() and eventually having to json_decode() it, i.e.
 	 * a lot of headaches.
+	 *
 	 * @since v4.6.0
 	 */
 	public function update_settings() {
@@ -420,6 +440,7 @@ class CAOS {
 
 		/**
 		 * Any options that're better off in their own DB row (e.g. due to size) can be added using this filter.
+		 *
 		 * @since v4.6.0
 		 */
 		$options = apply_filters( 'caos_update_settings_serialized', [ 'caos_settings', ] );
@@ -440,6 +461,7 @@ class CAOS {
 
 		/**
 		 * Additional update actions can be added here.
+		 *
 		 * @since v4.6.0
 		 */
 		do_action( 'caos_update_settings' );
@@ -453,6 +475,7 @@ class CAOS {
 	/**
 	 * Clean variables using `sanitize_text_field`.
 	 * Arrays are cleaned recursively. Non-scalar values are ignored.
+	 *
 	 * @since 4.6.0
 	 *
 	 * @param string|array $var Sanitize the variable.
@@ -465,5 +488,12 @@ class CAOS {
 		}
 
 		return is_scalar( $var ) ? sanitize_text_field( wp_unslash( $var ) ) : $var;
+	}
+
+	public function maybe_force_option_values() {
+		if ( self::uses_minimal_analytics() ) {
+			add_filter( 'caos_setting_' . CAOS_Admin_Settings::CAOS_ADV_SETTING_COMPATIBILITY_MODE, '__return_empty_string' );
+			add_filter( 'caos_setting_' . CAOS_Admin_Settings::CAOS_ADV_SETTING_DISABLE_ADS_FEATURES, '__return_empty_string' );
+		}
 	}
 }
