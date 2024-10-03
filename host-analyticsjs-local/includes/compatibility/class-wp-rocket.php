@@ -1,5 +1,4 @@
 <?php
-
 /* * * * * * * * * * * * * * * * * * * *
  *  ██████╗ █████╗  ██████╗ ███████╗
  * ██╔════╝██╔══██╗██╔═══██╗██╔════╝
@@ -14,25 +13,31 @@
  * @license  : GPL2v2 or later
  * * * * * * * * * * * * * * * * * * * */
 
-class CAOS_DB_Migrate_V422 extends CAOS_DB_Migrate {
-	protected $migrate_option_names = [
-		'sgal_anonymize_ip' => 'caos_anonymize_ip_mode',
-	];
-
-	protected $update_option_values = [
-		'caos_anonymize_ip_mode' => [ 'one', 'two' ],
-	];
-
-	protected $version = '4.2.2';
+class CAOS_Compatibility_WPRocket {
+	/**
+	 * Build class.
+	 */
+	public function __construct() {
+		$this->init();
+	}
 
 	/**
-	 * Build class
+	 * Action and filter hooks.
 	 *
 	 * @return void
 	 */
-	public function __construct() {
-		$this->migrate_option_names();
-		$this->update_option_values();
-		$this->update_db_version();
+	private function init() {
+		add_filter( 'rocket_excluded_inline_js_content', [ $this, 'exclude_minimal_analytics' ] );
+		add_filter( 'rocket_delay_js_exclusions', [ $this, 'exclude_minimal_analytics' ] );
+	}
+
+	public function exclude_minimal_analytics( $excluded_js ) {
+		if ( empty( CAOS::uses_minimal_analytics() || isset( $excluded_js[ 'caos-ma' ] ) ) ) {
+			return $excluded_js;
+		}
+
+		$excluded_js[ 'caos-ma' ] = 'window.minimalAnalytics';
+
+		return $excluded_js;
 	}
 }

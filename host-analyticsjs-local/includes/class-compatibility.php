@@ -1,5 +1,4 @@
 <?php
-
 /* * * * * * * * * * * * * * * * * * * *
  *  ██████╗ █████╗  ██████╗ ███████╗
  * ██╔════╝██╔══██╗██╔═══██╗██╔════╝
@@ -14,25 +13,26 @@
  * @license  : GPL2v2 or later
  * * * * * * * * * * * * * * * * * * * */
 
-class CAOS_DB_Migrate_V422 extends CAOS_DB_Migrate {
-	protected $migrate_option_names = [
-		'sgal_anonymize_ip' => 'caos_anonymize_ip_mode',
-	];
-
-	protected $update_option_values = [
-		'caos_anonymize_ip_mode' => [ 'one', 'two' ],
-	];
-
-	protected $version = '4.2.2';
+class CAOS_Compatibility {
+	/**
+	 * Build class.
+	 */
+	public function __construct() {
+		$this->init();
+	}
 
 	/**
-	 * Build class
+	 * Trigger compatibility fixes.
 	 *
 	 * @return void
 	 */
-	public function __construct() {
-		$this->migrate_option_names();
-		$this->update_option_values();
-		$this->update_db_version();
+	private function init() {
+		if ( defined( 'LSCWP_V' ) ) {
+			new CAOS_Compatibility_Litespeed();
+		}
+
+		if ( defined( 'WP_ROCKET_VERSION' ) ) {
+			new CAOS_Compatibility_WpRocket();
+		}
 	}
 }

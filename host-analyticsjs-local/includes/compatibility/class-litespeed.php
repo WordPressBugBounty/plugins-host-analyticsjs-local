@@ -1,5 +1,4 @@
 <?php
-
 /* * * * * * * * * * * * * * * * * * * *
  *  ██████╗ █████╗  ██████╗ ███████╗
  * ██╔════╝██╔══██╗██╔═══██╗██╔════╝
@@ -14,25 +13,31 @@
  * @license  : GPL2v2 or later
  * * * * * * * * * * * * * * * * * * * */
 
-class CAOS_DB_Migrate_V422 extends CAOS_DB_Migrate {
-	protected $migrate_option_names = [
-		'sgal_anonymize_ip' => 'caos_anonymize_ip_mode',
-	];
-
-	protected $update_option_values = [
-		'caos_anonymize_ip_mode' => [ 'one', 'two' ],
-	];
-
-	protected $version = '4.2.2';
+class CAOS_Compatibility_Litespeed {
+	/**
+	 * Build class.
+	 */
+	public function __construct() {
+		$this->init();
+	}
 
 	/**
-	 * Build class
+	 * Action and filter hooks.
 	 *
 	 * @return void
 	 */
-	public function __construct() {
-		$this->migrate_option_names();
-		$this->update_option_values();
-		$this->update_db_version();
+	private function init() {
+		add_filter( 'caos_script_custom_attributes', [ $this, 'exclude_from_litespeed' ] );
+	}
+
+	/**
+	 * Add data-no-optimize="1" attribute to script if LiteSpeed Cache is enabled.
+	 *
+	 * @param $attributes
+	 *
+	 * @return string
+	 */
+	public function exclude_from_litespeed( $attributes ) {
+		return 'data-no-optimize="1" ' . $attributes;
 	}
 }
