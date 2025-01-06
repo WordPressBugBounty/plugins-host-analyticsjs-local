@@ -13,7 +13,7 @@
  * @license  : GPL2v2 or later
  * * * * * * * * * * * * * * * * * * * */
 
-class CAOS_Compatibility_Litespeed {
+class CAOS_Compatibility_Autoptimize {
 	/**
 	 * Build class.
 	 */
@@ -27,8 +27,8 @@ class CAOS_Compatibility_Litespeed {
 	 * @return void
 	 */
 	private function init() {
-		add_filter( 'caos_gtag_custom_attributes', [ $this, 'exclude_from_litespeed' ] );
-		add_filter( 'caos_ma4_custom_attributes', [ $this, 'exclude_from_litespeed' ] );
+		add_filter( 'caos_gtag_custom_attributes', [ $this, 'exclude_from_autoptimize' ] );
+		add_filter( 'caos_ma4_custom_attributes', [ $this, 'exclude_from_autoptimize' ] );
 	}
 
 	/**
@@ -38,7 +38,7 @@ class CAOS_Compatibility_Litespeed {
 	 *
 	 * @return string
 	 */
-	public function exclude_from_litespeed( $attributes ) {
-		return 'data-no-optimize="1" ' . $attributes;
+	public function exclude_from_autoptimize( $attributes ) {
+		return 'data-noptimize="true" ' . $attributes;
 	}
 }

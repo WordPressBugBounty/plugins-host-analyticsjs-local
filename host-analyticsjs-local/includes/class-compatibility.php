@@ -27,8 +27,21 @@ class CAOS_Compatibility {
 	 * @return void
 	 */
 	private function init() {
+		if ( defined( 'AUTOPTIMIZE_PLUGIN_VERSION' ) ) {
+			new CAOS_Compatibility_Autoptimize();
+		}
+
+		/**
+		 * Always run Cloudflare compatibility, because it doesn't do any harm.
+		 */
+		new CAOS_Compatibility_Cloudflare();
+
 		if ( defined( 'LSCWP_V' ) ) {
 			new CAOS_Compatibility_Litespeed();
+		}
+
+		if ( defined( 'WPFC_MAIN_PATH' ) ) {
+			new CAOS_Compatibility_WpFastestCache();
 		}
 
 		if ( defined( 'WP_ROCKET_VERSION' ) ) {
