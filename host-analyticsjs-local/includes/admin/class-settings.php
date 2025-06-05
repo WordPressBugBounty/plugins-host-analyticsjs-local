@@ -133,7 +133,7 @@ class CAOS_Admin_Settings extends CAOS_Admin {
 		add_action( 'caos_settings_tab', [ $this, 'do_basic_settings_tab' ], 1 );
 		add_action( 'caos_settings_tab', [ $this, 'do_advanced_settings_tab' ], 2 );
 		add_action( 'caos_settings_tab', [ $this, 'do_extensions_tab' ], 3 );
-		add_action( 'caos_settings_tab', [ $this, 'do_help_tab' ], 4 );
+		add_action( 'caos_settings_tab', [ $this, 'do_help_tab' ], 5 );
 
 		// Settings Screen Content
 		add_action( 'caos_settings_content', [ $this, 'do_content' ], 1 );
@@ -156,7 +156,7 @@ class CAOS_Admin_Settings extends CAOS_Admin {
 	public function create_menu() {
 		add_options_page(
 			'CAOS',
-			'Optimize Google Analytics',
+			'CAOS',
 			'manage_options',
 			self::CAOS_ADMIN_PAGE,
 			[ $this, 'settings_page' ]
@@ -174,7 +174,7 @@ class CAOS_Admin_Settings extends CAOS_Admin {
 		} ?>
 
         <div class="wrap caos">
-            <h1><?php _e( 'CAOS | Complete Analytics Optimization Suite', 'host-analyticsjs-local' ); ?></h1>
+            <h1><?php echo apply_filters( 'caos_settings_page_title', __( 'CAOS | Complete Analytics Optimization Suite', 'host-analyticsjs-local' ) ); ?></h1>
 
 			<?php if ( empty( CAOS::get( self::CAOS_BASIC_SETTING_TRACKING_CODE ) ) ) : ?>
                 <div class="notice notice-info">
@@ -355,8 +355,12 @@ class CAOS_Admin_Settings extends CAOS_Admin {
 			return;
 		}
 
-		echo '<script>' . file_get_contents( plugin_dir_path( CAOS_PLUGIN_FILE ) . 'assets/js/caos-admin.js' ) . '</script>';
-		echo '<style>' . file_get_contents( plugin_dir_path( CAOS_PLUGIN_FILE ) . 'assets/css/caos-admin.css' ) . '</style>';
+		$fonts_stylesheet = file_get_contents( plugin_dir_path( CAOS_PLUGIN_FILE ) . 'assets/css/caos-admin-google-fonts.min.css' );
+		$fonts_stylesheet = str_replace( '../fonts/', plugin_dir_url( CAOS_PLUGIN_FILE ) . 'assets/fonts/', $fonts_stylesheet );
+
+		echo '<script>' . file_get_contents( plugin_dir_path( CAOS_PLUGIN_FILE ) . 'assets/js/caos-admin.min.js' ) . '</script>';
+		echo '<style>' . $fonts_stylesheet . '</style>';
+		echo '<style>' . file_get_contents( plugin_dir_path( CAOS_PLUGIN_FILE ) . 'assets/css/caos-admin.min.css' ) . '</style>';
 	}
 
 	/**
@@ -521,7 +525,7 @@ class CAOS_Admin_Settings extends CAOS_Admin {
 			}
 
 			$hide = $i > 0 ? 'style="display: none;"' : '';
-			$text .= "<span class='ticker-item' $hide>" . sprintf( '<a target="_blank" href="%s"><em>%s</em></a>', $item->link, $item->title ) . '</span>';
+			$text .= "<span class='ticker-item' $hide>" . sprintf( '<a target="_blank" href="%s"><em>%s</em></a>', esc_url( $item->link ), esc_html( $item->title ) ) . '</span>';
 			$i ++;
 		}
 
