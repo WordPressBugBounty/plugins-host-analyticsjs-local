@@ -80,6 +80,10 @@ class CAOS_Admin_Updates {
 	 * @return mixed
 	 */
 	public function maybe_display_premium_update_notice( $installed_plugins ) {
+		if ( ! is_array( $installed_plugins ) ) {
+			return $installed_plugins;
+		}
+
 		$plugin_slugs = array_keys( $installed_plugins );
 
 		foreach ( $this->premium_plugins as $id => $premium_plugin ) {
@@ -91,7 +95,7 @@ class CAOS_Admin_Updates {
 				continue;
 			}
 
-			$latest_version  = $this->get_latest_version( $id, $premium_plugin[ 'transient_label' ] );
+			$latest_version  = $this->get_latest_version( $id );
 			$current_version = get_plugin_data( WP_PLUGIN_DIR . '/' . $premium_plugin[ 'basename' ] )[ 'Version' ] ?? '';
 
 			if ( version_compare( $current_version, $latest_version, '<' ) ) {
@@ -162,7 +166,7 @@ class CAOS_Admin_Updates {
 		 * If $latest_versions is an empty string, that probably means something went wrong before. So,
 		 * we should try and refresh it. If $latest_versions is false, then the transient doesn't exist.
 		 */
-		if ( $latest_version === '' ) {
+		if ( empty( $latest_version ) ) {
 			$response       = wp_remote_get( 'https://daan.dev/?edd_action=get_version&item_id=' . $id );
 			$latest_version = json_decode( wp_remote_retrieve_body( $response ) )->new_version ?? '';
 
@@ -197,7 +201,7 @@ class CAOS_Admin_Updates {
 		$label  = $plugin_data[ 'Name' ] ?? $plugin_data[ 'name' ] ?? 'this plugin';
 		$notice = sprintf(
 			__(
-				'An update for %1$s is available, but we\'re having trouble retrieving it. Download it from <a href="%2$s" target="_blank">your account area</a> and install it manually. <a href="%3$s" target="_blank">Need help</a>?',
+				'An update for %1$s is available, but we\'re having trouble retrieving it. Download it from <a href=\'%2$s\' target=\'_blank\'>your account area</a> and install it manually. <a href=\'%3$s\' target=\'_blank\'>Need help</a>?',
 				$this->plugin_text_domain
 			),
 			$label,
@@ -218,7 +222,7 @@ class CAOS_Admin_Updates {
                 }
 
                 if (div instanceof HTMLCollection && "0" in div) {
-                    div[0].getElementsByTagName('p')[0].innerHTML = "<?php echo wp_kses( $notice, 'post' ); ?>";
+                    div[0].getElementsByTagName('p')[0].innerHTML = "<?php echo wp_kses_post( $notice ); ?>";
                 }
             })
         </script>
@@ -255,7 +259,7 @@ class CAOS_Admin_Updates {
 				continue;
 			}
 
-			$latest_version  = $this->get_latest_version( $id, $plugin[ 'transient_label' ] );
+			$latest_version  = $this->get_latest_version( $id );
 			$plugin_data     = get_plugin_data( WP_PLUGIN_DIR . '/' . $plugin[ 'basename' ] );
 			$current_version = $plugin_data[ 'Version' ] ?? '';
 
@@ -293,7 +297,7 @@ class CAOS_Admin_Updates {
 				continue;
 			}
 
-			$latest_version  = $this->get_latest_version( $id, $plugin[ 'transient_label' ] );
+			$latest_version  = $this->get_latest_version( $id );
 			$plugin_data     = get_plugin_data( WP_PLUGIN_DIR . '/' . $plugin[ 'basename' ] );
 			$current_version = $plugin_data[ 'Version' ] ?? '';
 
