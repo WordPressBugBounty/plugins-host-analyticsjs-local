@@ -2,8 +2,8 @@
 Contributors: DaanvandenBergh
 Tags: google, analytics, gtag, minimal, gdpr
 Requires at least: 4.6
-Tested up to: 6.9
-Stable tag: 5.0.2
+Tested up to: 7.0
+Stable tag: 5.0.3
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -20,7 +20,8 @@ Not a big Google Analytics user and just curious about your pageviews? CAOS full
 
 Whenever you run an analysis of your website on *Google Pagespeed Insights*, *Pingdom* or *GTMetrix*, it'll tell you to **leverage browser cache** when you're using Google Analytics. Because Google has set the cache expiry time to 2 hours. This plugin will get you a **higher score** on Pagespeed and Pingdom and make **your website load faster**, because the user's browser doesn't have to make a roundtrip to download the file from Google's external server.
 
-Just install the plugin, enter your Mesurement ID and the plugin adds the necessary Tracking Code for Google Analytics 4 to the header (or footer) of your theme, downloads and saves the gtag.js-file to your website's server and keeps it updated (automagically) using a scheduled script in wp_cron(). Or if you'd like to use the locally hosted file with another plugin, check **Compatibility Mode** under *Advanced Settings*, Either way, CAOS is a set and forget plugin.
+Just install the plugin, enter your Measurement ID and the plugin adds the necessary Tracking Code for Google Analytics 4 to the header (or footer) of your theme, downloads and saves the gtag.js-file
+to your website's server and keeps it updated (automagically) using a scheduled script in wp_cron(). Or if you'd like to use the locally hosted file with another plugin, check **Compatibility Mode** under *Advanced Settings*, Either way, CAOS is a set and forget plugin.
 
 For more information: [How to setup CAOS](For more information: [How to setup CAOS](https://daan.dev/docs/caos/?utm_source=wordpress&utm_medium=description&utm_campaign=caos).
 
@@ -75,6 +76,9 @@ For CAOS' FAQ and Troubleshooting, [visit the docs](https://daan.dev/docs/caos-t
 N/A
 
 == Changelog ==
+
+= 5.0.3 =
+* Tested with WP 7.0.
 
 = 5.0.2 =
 * Fixed: Preconnect attribute shouldn't be added when Allow Tracking is set.
